@@ -6,17 +6,17 @@
     </js-module>
 
     <!-- <hook type="after_plugin_add" src="hooks/after_plugin_add.js" /> -->
-    <platform name="browser">
+    <!--<platform name="browser">
         <config-file target="config.xml" parent="/*">
             <feature name="Carrier">
                 <param name="browser-package" value="Carrier" />
             </feature>
         </config-file>
 
-        <js-module src="src/browser/CarrierProxy.js" name="CarrierProxy">
+        <js-module src="src/electron/CarrierProxy.js" name="CarrierProxy">
             <runs />
         </js-module>
-    </platform>
+    </platform>-->
     <platform name="android">
         <config-file target="config.xml" parent="/*">
             <feature name="CarrierPlugin">
