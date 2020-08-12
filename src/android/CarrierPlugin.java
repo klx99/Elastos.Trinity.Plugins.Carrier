@@ -1442,7 +1442,7 @@
                 PluginResult result;
 
                 try {
-                    transfer.writeData(fileId, data.getBytes());
+                    transfer.writeData(fileId, data.getBytes(Charset.forName("UTF-8")));
                     result = new PluginResult(PluginResult.Status.OK, SUCCESS);
                 } catch (CarrierException e) {
                     result = new PluginResult(PluginResult.Status.ERROR, INVALID_ID);
