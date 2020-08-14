@@ -1535,13 +1535,13 @@
       private void newFileTransfer(JSONArray args, CallbackContext callbackContext) throws JSONException, CarrierException {
           Integer id = args.getInt(0);
           String to = args.getString(1);
-          JSONObject fileInfo = args.getJSONObject(2);
+          JSONObject fileInfo = args.optJSONObject(2);
           PluginCarrierHandler carrierHandler = mCarrierMap.get(id);
           if (carrierHandler != null) {
 
               PluginFileTransferHandler pluginFileTransferHandler = new PluginFileTransferHandler(mFileTransferCallbackContext);
               FileTransfer fileTransfer = carrierHandler.getFileTransferManager()
-                      .newFileTransfer(to,decodeFileTransferInfo(fileInfo),pluginFileTransferHandler);
+                      .newFileTransfer(to, fileInfo != null ? decodeFileTransferInfo(fileInfo) : null,pluginFileTransferHandler);
 
               if (fileTransfer != null) {
                   Integer code = System.identityHashCode(fileTransfer);
@@ -1566,7 +1566,7 @@
           callbackContext.success(jsonObject);
       }
 
-      private FileTransferInfo decodeFileTransferInfo(JSONObject jsonObject) throws JSONException {
+      private FileTransferInfo decodeFileTransferInfo(JSONObject jsonObject) throws JSONException, CarrierException {
           String filename = jsonObject.getString("filename");
           String fileId = jsonObject.getString("fileId");
           long size = jsonObject.getLong("size");

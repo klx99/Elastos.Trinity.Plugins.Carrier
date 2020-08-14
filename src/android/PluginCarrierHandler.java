@@ -445,7 +445,8 @@ package org.elastos.trinity.plugins.carrier;
 		  try {
 			  r.put("name", "onConnectRequest");
 			  r.put("from", from);
-			  r.put("info", createFileTransferJSON(info));
+			  if (info != null)
+                  r.put("info", createFileTransferJSON(info));
 			  sendEvent(r);
 		  } catch (JSONException e) {
 			  e.printStackTrace();
