@@ -27,14 +27,6 @@ typealias Carrier = ElastosCarrierSDK.Carrier
 typealias Session = ElastosCarrierSDK.CarrierSession
 typealias Group = ElastosCarrierSDK.CarrierGroup
 
-@inline(__always) internal func getArgumentAsInt(_ command: CDVInvokedUrlCommand, _ index: UInt) -> Int {
-    return command.argument(at: index) as? Int ?? -1
-}
-
-@inline(__always) internal func getArgumentAsString(_ command: CDVInvokedUrlCommand, _ index: UInt) -> String {
-    return command.argument(at: index) as? String ?? ""
-}
-
 @objc(CarrierPlugin)
 class CarrierPlugin : TrinityPlugin {
 
@@ -1186,39 +1178,23 @@ class CarrierPlugin : TrinityPlugin {
     }
 
     @objc func writeFileTransData(_ command: CDVInvokedUrlCommand) {
-        let transferId = getArgumentAsInt(command, 0)
-        let fileId     = getArgumentAsString(command, 1)
-        let data       = getArgumentAsString(command, 2)
-        let rawData    = data.data(using: .utf8)!
+        let fileTransferId = command.arguments[0] as? Int ?? 0
+        let fileId = command.arguments[1] as? String ?? ""
+        let data = command.arguments[2] as? String ?? ""
+        let rawData:Data = data.data(using: .utf8)!
 
-        let handler = mFileTransferDict[transferId];
-        guard let _ = handler else {
-            self.error(command, retAsString: "Id invalid")
-            return
-        }
-
-        let backgroundQueue = DispatchQueue(label: "org.elastos.carrier",
-                                              qos: .background,
-                                           target: nil)
-        weak var weakHandler = handler
-
-        backgroundQueue.async {
-            let result: CDVPluginResult
-
+        if let fileTransferHandler: PluginFileTransferHandler = mFileTransferDict[fileTransferId] {
             do {
-                try weakHandler?.fileTransfer?.sendData(fileId: fileId, withData: rawData)
-                result = CDVPluginResult(status: CDVCommandStatus_OK, messageAs: "Success")
-            } catch {
-                result = CDVPluginResult(status: CDVCommandStatus_ERROR, messageAs: error.localizedDescription)
+                try fileTransferHandler.fileTransfer?.sendData(fileId: fileId, withData: rawData)
+                self.success(command, retAsString: "success!");
             }
-
-            result.setKeepCallbackAs(true)
-            self.commandDelegate.send(result, callbackId: command.callbackId)
+            catch {
+                self.error(command, retAsString: error.localizedDescription);
+            }
         }
-
-        let result = CDVPluginResult(status: CDVCommandStatus_NO_RESULT);
-        result?.setKeepCallbackAs(true);
-        self.commandDelegate.send(result, callbackId: command.callbackId)
+        else {
+            self.error(command, retAsString: "Id invalid!");
+        }
     }
 
     @objc func sendFileTransFinish(_ command: CDVInvokedUrlCommand) {
